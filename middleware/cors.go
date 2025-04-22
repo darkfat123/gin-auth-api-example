@@ -1,13 +1,26 @@
 package middleware
 
-import "github.com/gin-gonic/gin"
+import (
+	"os"
 
-// ปรับให้ไม่มีการตอบกลับ OPTIONS
+	"github.com/gin-gonic/gin"
+)
+
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*") // หรือระบุ domain เช่น https://example.com
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization")
+		origin := c.GetHeader("Origin")
+		if origin == os.Getenv("ALLOWED_ORIGINS") {
+			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+			c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+			c.Writer.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+		}
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
 		c.Next()
 	}
 }
