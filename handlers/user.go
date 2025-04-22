@@ -12,7 +12,8 @@ func GetUserByID(c *gin.Context) {
 	id := c.Param("id")
 	user, err := services.GetUserByIDService(c, id)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, response.UserResponse{

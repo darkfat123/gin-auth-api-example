@@ -3,6 +3,7 @@ package main
 import (
 	"gin-auth-api-example/database"
 	"gin-auth-api-example/handlers"
+	"gin-auth-api-example/middleware"
 	"gin-auth-api-example/redis"
 	"log"
 
@@ -25,6 +26,9 @@ func main() {
 
 	router := gin.Default()
 
+	router.Use(middleware.CORSMiddleware())
+	router.Use(middleware.SecurityHeaders())
+
 	auth := router.Group("/auth")
 	{
 		auth.POST("/register", handlers.Register)
@@ -33,7 +37,7 @@ func main() {
 		auth.POST("/logout", handlers.Logout)
 	}
 
-	api := router.Group("/api")
+	api := router.Group("/api", middleware.JWTAuthMiddleware())
 	{
 		api.GET("/user/:id", handlers.GetUserByID)
 	}

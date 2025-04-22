@@ -14,7 +14,7 @@ func GetUserByIDService(c *gin.Context, id string) (*model.Users, error) {
 	query := `SELECT * FROM users where id = $1`
 	err := database.DB.GetContext(c, &user, query, id)
 	if err != nil {
-		return nil, errors.New("invalid username or password")
+		return nil, errors.New("data not found")
 	}
 
 	return &user, nil
