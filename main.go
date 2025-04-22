@@ -33,5 +33,10 @@ func main() {
 		auth.POST("/logout", handlers.Logout)
 	}
 
+	api := router.Group("/api")
+	{
+		api.GET("/user/:id", handlers.GetUserByID)
+	}
+
 	router.Run()
 }
