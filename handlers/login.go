@@ -4,7 +4,6 @@ import (
 	"gin-auth-api-example/schema/request"
 	"gin-auth-api-example/schema/response"
 	"gin-auth-api-example/services"
-	"gin-auth-api-example/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,7 +23,8 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	utils.SetRefreshCookie(c, service.RefreshToken)
+	c.SetCookie("refresh_token", service.RefreshToken, 3600*24, "/", "", true, true)
+	c.SetCookie("csrf_token", service.CsrfToken, 3600*24, "/", "", true, false)
 
 	c.JSON(http.StatusOK, response.LoginResponse{
 		AccessToken: service.AccessToken,

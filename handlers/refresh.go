@@ -18,6 +18,7 @@ func Refresh(c *gin.Context) {
 	service, err := services.RefreshService(c, rt)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, response.RefreshResponse{

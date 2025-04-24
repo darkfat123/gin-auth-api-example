@@ -17,6 +17,7 @@ import (
 type loginResult struct {
 	AccessToken  string
 	RefreshToken string
+	CsrfToken    string
 }
 
 func LoginService(c *gin.Context, req *request.LoginRequest) (*loginResult, error) {
@@ -49,8 +50,17 @@ func LoginService(c *gin.Context, req *request.LoginRequest) (*loginResult, erro
 		log.Println("Redis err:", err)
 	}
 
+	csrfToken, err := utils.GenerateCSRFToken()
+	if err != nil {
+		return nil, err
+	}
+
+	// // ส่งไปให้ frontend เก็บไว้ใน memory แล้วใช้แนบ header
+	// c.SetCookie("csrf_token", csrfToken, 3600*24, "/", "", false, false)
+
 	return &loginResult{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
+		CsrfToken:    csrfToken,
 	}, nil
 }

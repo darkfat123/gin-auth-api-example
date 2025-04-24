@@ -30,6 +30,7 @@ func Logout(c *gin.Context) {
 
 	userID := strconv.Itoa(int(userIDFloat))
 	redis.DeleteData(userID)
-	utils.ClearRefreshCookie(c)
+	c.SetCookie("refresh_token", "", -1, "/", "", true, true)
+
 	c.JSON(http.StatusOK, gin.H{"message": "logged out"})
 }

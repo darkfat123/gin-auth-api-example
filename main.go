@@ -33,7 +33,7 @@ func main() {
 	{
 		auth.POST("/register", handlers.Register)
 		auth.POST("/login", handlers.Login)
-		auth.POST("/refresh", handlers.Refresh)
+		auth.POST("/refresh", middleware.CSRFMiddleware(), handlers.Refresh)
 		auth.POST("/logout", handlers.Logout)
 	}
 
