@@ -55,9 +55,6 @@ func LoginService(c *gin.Context, req *request.LoginRequest) (*loginResult, erro
 		return nil, err
 	}
 
-	// // ส่งไปให้ frontend เก็บไว้ใน memory แล้วใช้แนบ header
-	// c.SetCookie("csrf_token", csrfToken, 3600*24, "/", "", false, false)
-
 	return &loginResult{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,

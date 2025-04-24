@@ -36,7 +36,6 @@ func main() {
 		auth.POST("/refresh", middleware.CSRFMiddleware(), handlers.Refresh)
 		auth.POST("/logout", handlers.Logout)
 	}
-
 	api := router.Group("/api", middleware.JWTAuthMiddleware())
 	{
 		api.GET("/user/:id", handlers.GetUserByID)

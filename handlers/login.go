@@ -5,6 +5,8 @@ import (
 	"gin-auth-api-example/schema/response"
 	"gin-auth-api-example/services"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,8 +25,31 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("refresh_token", service.RefreshToken, 3600*24, "/", "", true, true)
-	c.SetCookie("csrf_token", service.CsrfToken, 3600*24, "/", "", true, false)
+	maxAge, err := strconv.Atoi(os.Getenv("REFRESH_TOKEN_MAX_AGE"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid REFRESH_TOKEN_MAX_AGE value"})
+		return
+	}
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    service.RefreshToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		MaxAge:   maxAge,
+	})
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "csrf_token",
+		Value:    service.CsrfToken,
+		Path:     "/",
+		HttpOnly: false,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		MaxAge:   maxAge,
+	})
 
 	c.JSON(http.StatusOK, response.LoginResponse{
 		AccessToken: service.AccessToken,
