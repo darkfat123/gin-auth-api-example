@@ -15,5 +15,9 @@ jobs:
       - name: Examine suspicious constructs
         run: |
           go vet ./...
+      
+      - name: Look for vulnerabilities
+        run: |
+          govulncheck ./...
 
     
