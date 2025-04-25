@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 var (
@@ -26,6 +27,7 @@ func GenerateAccessToken(userID int) (string, error) {
 func GenerateRefreshToken(userID int, exp int64) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
+		"sub":     generatUUID(),
 		"exp":     exp,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -61,4 +63,8 @@ func GenerateCSRFToken() (string, error) {
 		return "", err
 	}
 	return base64.StdEncoding.EncodeToString(b), nil
+}
+
+func generatUUID() uuid.UUID {
+	return uuid.New()
 }
