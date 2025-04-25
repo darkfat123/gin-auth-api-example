@@ -38,13 +38,15 @@ func LoginService(c *gin.Context, req *request.LoginRequest) (*loginResult, erro
 		return nil, err
 	}
 
-	refreshToken, err := utils.GenerateRefreshToken(user.ID)
+	exp := time.Now().Add(24 * time.Hour).Unix()
+	refreshToken, err := utils.GenerateRefreshToken(user.ID, exp)
 	if err != nil {
 		return nil, err
 	}
 
 	key := strconv.Itoa(user.ID)
-	err = redis.SetData(key, refreshToken, 24*time.Hour)
+	ttl := time.Until(time.Unix(exp, 0))
+	err = redis.SetData(key, refreshToken, ttl)
 
 	if err != nil {
 		log.Println("Redis err:", err)

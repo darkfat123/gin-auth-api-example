@@ -23,6 +23,7 @@ func RefreshService(c *gin.Context, rt string) (*refreshResult, error) {
 	}
 
 	userID := int(token.Claims.(jwt.MapClaims)["user_id"].(float64))
+	exp := int64(token.Claims.(jwt.MapClaims)["exp"].(float64))
 
 	val, err := redis.GetData(strconv.Itoa(userID))
 	if err != nil || val != rt {
@@ -39,13 +40,13 @@ func RefreshService(c *gin.Context, rt string) (*refreshResult, error) {
 		return nil, errors.New("failed to generate access token")
 	}
 
-	newRefreshToken, err := utils.GenerateRefreshToken(userID)
+	newRefreshToken, err := utils.GenerateRefreshToken(userID, exp)
 	if err != nil {
-		return nil, errors.New("failed to generate new refresh token")
+		return nil, err
 	}
 
-	expirationTime := 3600 * 24
-	err = redis.SetData(strconv.Itoa(userID), newRefreshToken, time.Duration(expirationTime)*time.Second)
+	ttl := time.Until(time.Unix(exp, 0))
+	err = redis.SetData(strconv.Itoa(userID), newRefreshToken, ttl)
 	if err != nil {
 		return nil, errors.New("failed to store new refresh token")
 	}

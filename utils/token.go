@@ -23,10 +23,10 @@ func GenerateAccessToken(userID int) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-func GenerateRefreshToken(userID int) (string, error) {
+func GenerateRefreshToken(userID int, exp int64) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
-		"exp":     time.Now().Add(24 * time.Hour).Unix(),
+		"exp":     exp,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtSecret)
